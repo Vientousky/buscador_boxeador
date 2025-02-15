@@ -8,8 +8,7 @@ const Heros: React.FC = () => {
       <article className={styles.container}>
         <h1>¿Buscador de boxeadores?</h1>
         <p>encuentra cualquier boxeador de la provincia del chaco argentina</p>
-
-        <Busqueda/>
+      <Busqueda/>
       </article>
     </section>
   );

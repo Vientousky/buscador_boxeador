@@ -1,4 +1,4 @@
-.container {
+& .container {
     max-width: 900px;
     min-height: 100vh;
     width: 90%;
@@ -7,13 +7,13 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
     text-align: center;
+    gap: 1.5rem;
+    transform: translateY(-20px);
+    animation: fadeIn 0.6s ease-out forwards;
 
 
-    h1 {
+    & h1 {
         color: transparent;
         background: linear-gradient(90deg,Orange ,#bd0725  );
         background-clip: text;
@@ -24,77 +24,114 @@
         letter-spacing: 1px;
     }
 
-    p {
+    & p {
         font-size: 1.3rem;
         line-height: 1.6;
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* <===< busqueda>===> */
+
 
 .searchBar {
     margin-bottom: 2rem;
     width: 100%;
+    opacity: 0;
+    transform: translateY(-15px);
+    animation: slideDown 0.5s ease-out forwards 0.3s;
+
+    > .form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #121212;
+        border: 2px solid #1786be;
+        border-radius: 9999px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
+
+        &:focus-within {
+            border-color: #bd0725;
+            box-shadow: 0 0 10px #bd0725;
+        }
+        
+        & .searchIcon {
+            display: flex;
+            font-size: 1.4rem;
+            color: #e0e0e0;
+        
+        }
+
+        > .input {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 5px 10px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            outline: none;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+                font-style: italic;
+            }
+        }
+    }
 }
 
-.form {
-    display: flex;
-    align-items: center;
-    background-color: #121212;
-    border: 2px solid #1786be;
-    border-radius: 9999px;
-    padding: 8px 12px;
-    transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
-}
-
-.form:focus-within {
-    border-color: #bd0725;
-    box-shadow: 0 0 10px #bd0725;
-}
-
-.searchIcon {
-    font-size: 1.5rem;
-    color: #e0e0e0;
-    margin-right: 8px;
-}
-
-.input {
-    width: 100%;
-    font-size: 1.1rem;
-    padding: 5px 10px;
-    background: transparent;
-    border: none;
-    color: #e0e0e0;
-    outline: none;
-}
-
-.input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-    font-style: italic;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* <===< Tabla>===> */
 
 .table {
-
     width: 100%;
     border-collapse: collapse;
     font-size: 1rem;
     color: #e0e0e0;
+    transition: 0.3s ease-in-out;
 
-    th {
+    & th {
         color: #1786be;
         font-weight: 700;
         text-transform: uppercase;
         padding: 10px;
         border-bottom: 2px solid #1786be;
     }
+    & tr {
+        transition: 0.3s ease-in;
+    }
 
-    td {
+    & tr:hover {
+        background: #3b537d; /* Efecto hover para mejorar la experiencia */
+        transition: background 0.3s ease-in-out;
+    }
+
+    & td {
         padding: 1rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
 
-        >a {
+        & a {
 
             color: #1786be;
             text-decoration: none;
@@ -106,4 +143,59 @@
             }
         }
     }
+
 }
+
+/* <===< Reposibilidad>===> */
+
+    @media(max-width:762px) {
+        .container  {
+            padding: 2rem 0;
+
+            & h1{
+                    font-size: 2.6rem;
+            }
+        }
+
+        .table {
+            & th {
+                display: none; 
+            }
+
+            
+            & tr {
+                background: #24344d; 
+                color: #ffffff;
+            }
+            
+            & tr:nth-of-type(2n) {
+                background: #2c3e5e; 
+            }
+
+                    
+
+            & td {
+
+                border: 0;
+                text-align: left;
+                display: grid;
+                grid-template-columns: 15ch auto;
+
+
+                &::before {
+                    content: attr(data-cell)": ";
+                    font-weight: 700;
+                    text-transform: capitalize;
+                     
+                }
+
+                &:first-child {
+                    padding-top: 2rem;
+                }
+
+                &:last-child {
+                    padding-bottom: 2rem;
+                }
+            }
+        }
+    }

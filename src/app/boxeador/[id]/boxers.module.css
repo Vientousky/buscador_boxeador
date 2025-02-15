@@ -1,0 +1,94 @@
+.container {
+    max-width: 800px;
+    width: 90%;
+    min-height: 40vh;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 0.6fr 1fr;
+    gap: 2rem 1rem;
+    padding: 2rem 0;
+    border-radius: 16px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+
+    & .img img {
+        width: 100%;
+        border-radius: 2rem;
+        object-fit: cover;
+    }
+
+    & .info {
+        & h1 {
+            background: linear-gradient(90deg, #ff8c00, #d400ff);
+            color: transparent;
+            background-clip: text;
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        & p {
+            line-height: 1.8;
+
+            & strong {
+                color: #ff9900;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    & .VED { 
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-column: span 2;
+        gap: 1.5rem;
+
+        & .card {
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+            &:first-child {
+                background-color: #27ae60; /* Verde esmeralda */
+            }
+
+            &:nth-child(2) {
+                background-color: #1f81d6; /* Azul profundo */
+            }
+
+            &:nth-child(3) {
+                background-color: #c62828; /* Rojo intenso */
+            }
+
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            & h1 {
+                margin-bottom: 10px;
+            }
+
+            & p {
+                font-size: 2.4rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+
+    }
+
+    .img img {
+        max-height: 300px;
+        object-fit: cover;
+    }
+
+    .VED {
+        grid-column: span 1;
+    }
+}
