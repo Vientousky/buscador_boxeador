@@ -108,6 +108,11 @@ export default function PerfilBoxeador() {
           <h1>Derrotas</h1>
           <p>{boxeador.perdidas}</p>
         </div>
+
+        <div className={styles.card}>
+          <h1>Sin decición</h1>
+          <p>{boxeador.sin_dec || "0"}  </p>
+        </div>
       </article>
     </section>
   );

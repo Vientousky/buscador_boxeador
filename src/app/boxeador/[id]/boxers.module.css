@@ -37,7 +37,8 @@
     }
 
     & .VED { 
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         grid-column: span 2;
         gap: 1.5rem;
 
@@ -59,6 +60,10 @@
 
             &:nth-child(3) {
                 background-color: #c62828; /* Rojo intenso */
+            }
+
+            &:nth-child(4) {
+                background-color: #4d4a4a; /* Rojo intenso */
             }
 
             &:hover {
