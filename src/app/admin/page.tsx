@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import style from "./page.module.css";
 
@@ -21,10 +21,28 @@ interface Boxeador {
   ganadas: string;
   perdidas: string;
   empatadas: string;
+  sin_dec: string;
+  imagen_url?: string;
 }
 
 const AdminPage: React.FC = () => {
   const [boxeadores, setBoxeadores] = useState<Boxeador[]>([]);
+  const [formData, setFormData] = useState<Boxeador>({
+    id: null,
+    dni: "",
+    nombre: "",
+    apellido: "",
+    localidad: "",
+    peso: "",
+    fecha_nac: "",
+    num_lic: "",
+    ganadas: "0",
+    perdidas: "0",
+    empatadas: "0",
+    sin_dec: "0",
+    imagen_url: ""
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchBoxeadores();
@@ -36,81 +54,110 @@ const AdminPage: React.FC = () => {
     else setBoxeadores(data as Boxeador[]);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    let imageUrl = formData.imagen_url;
+
+    // Subir la imagen al storage de Supabase si se seleccionó una imagen
+    if (imageFile) {
+      const { data, error } = await supabase.storage
+        .from("boxeadores")
+        .upload(`images/${formData.dni}`, imageFile, { upsert: true });
+
+      if (error) {
+        console.error("Error al subir la imagen:", error.message);
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from("boxeadores")
+        .getPublicUrl(data.path);
+
+      imageUrl = publicUrlData?.publicUrl ?? "";
+    }
+
+    const { error } = await supabase.from("perfil").upsert({
+      ...formData,
+      imagen_url: imageUrl
+    });
+
+    if (error) console.error(error);
+    else {
+      setFormData({
+        id: null,
+        dni: "",
+        nombre: "",
+        apellido: "",
+        localidad: "",
+        peso: "",
+        fecha_nac: "",
+        num_lic: "",
+        ganadas: "0",
+        perdidas: "0",
+        empatadas: "0",
+        sin_dec: "0",
+        imagen_url: ""
+      });
+      setImageFile(null);
+      fetchBoxeadores();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleEdit = (boxeador: Boxeador) => {
+    setFormData(boxeador);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <section className={style.container}>
       <h1>Administrar Boxeadores</h1>
-      <form className={style.form} >
-        <div  className={style.formGroup}>
-          <label htmlFor="Nombre">Nombre</label>
-          <input type="text" id="Nombre"  />
-        </div>
 
-        <div className={style.formGroup}>
-          <label htmlFor="Apellido">Apellido</label>
-          <input type="text" id="Apellido"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="DNI">DNI</label>
-          <input type="text" id="DNI"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="Localidad">Localidad</label>
-          <input type="text" id="Localidad"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="Peso">Peso</label>
-          <input type="text" id="Peso"  />
-        </div>
-
-
-        <div className={style.formGroup}>
-          <label htmlFor="Ganadas">Victorias</label>
-          <input type="number" id="Ganadas"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="Perdidas">Derrotas</label>
-          <input type="number" id="Perdidas"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="Empatadas">Empatadas</label>
-          <input type="number" id="Empatadas"  />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="FechaNac">Sin decición</label>
-          <input type="number" id="FechaNac"  />
-        </div>
+      {/* Formulario */}
+      <form className={style.form} onSubmit={handleSubmit}>
+        {["dni", "nombre", "apellido", "localidad", "peso", "fecha_nac", "num_lic", "ganadas", "perdidas", "empatadas", "sin_dec"].map((field) => (
+          <div key={field} className={style.formGroup}>
+            <label htmlFor={field}>{field}</label>
+            <input
+              type="text"
+              id={field}
+              value={formData[field as keyof Boxeador] || ""}
+              onChange={handleInputChange}
+            />
+          </div>
+        ))}
 
         <div className={style.imgGroup}>
           <label htmlFor="Foto">Foto</label>
-          <input type="file" id="Foto"  />
+          <input type="file" id="Foto" onChange={handleImageChange} />
         </div>
 
-        <button className={style.btn} >Crear Boxeador</button>
-
+        <button className={style.btn} type="submit">
+          {formData.id ? "Actualizar Boxeador" : "Crear Boxeador"}
+        </button>
       </form>
 
+      {/* Tabla de Boxeadores */}
       <table className={style.table}>
         <caption>Boxeadores</caption>
         <thead>
           <tr>
             <th>ID</th>
             <th>DNI</th>
-            <th>Peso</th>
             <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Localidad</th>
-            <th>Fecha Nac.</th>
-            <th>Fecha Lic.</th>
-            <th>Victorias</th>
-            <th>Derrotas</th>
-            <th>Empates</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -118,17 +165,16 @@ const AdminPage: React.FC = () => {
             <tr key={boxeador.id}>
               <td>{boxeador.id}</td>
               <td>{boxeador.dni}</td>
-              <td>{boxeador.peso}</td>
               <td>{boxeador.nombre}</td>
               <td>{boxeador.apellido}</td>
-              <td>{boxeador.localidad}</td>
               <td>{boxeador.fecha_nac}</td>
-              <td>{boxeador.num_lic}</td>
-              <td>{boxeador.ganadas}</td>
-              <td>{boxeador.perdidas}</td>
+              <td>{boxeador.localidad}</td>
               <td>{boxeador.empatadas}</td>
+              <td>{boxeador.perdidas}</td>
+              <td>{boxeador.ganadas}</td>
+              <td>{boxeador.peso}</td>
               <td>
-                <button>Editar</button>
+                <button onClick={() => handleEdit(boxeador)}>Editar</button>
               </td>
             </tr>
           ))}
